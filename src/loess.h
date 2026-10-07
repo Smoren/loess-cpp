@@ -15,12 +15,14 @@ private:
 
     static double _tricube_kernel(double u);
 
-    // Векторизованная версия вычисления весов
-    [[nodiscard]] Eigen::VectorXd _compute_weights(const Eigen::VectorXd &t_values, double t_target) const;
+    // Vectorized weight computation (the result is written to weights,
+    // scratch is a reusable buffer for finding the k-th distance)
+    void _compute_weights(const Eigen::VectorXd &t_values, double t_target,
+                          Eigen::VectorXd &weights, Eigen::VectorXd &scratch) const;
 
-    // Оптимизированная версия локальной регрессии
+    // Optimized version of the local regression (weighted least squares via moments)
     [[nodiscard]] Eigen::MatrixXd _local_regression_batch(const Eigen::VectorXd &t_values, const Eigen::MatrixXd &data, const Eigen::VectorXd &target_times) const;
 
-    // Вспомогательный метод для построения матрицы плана
-    static void _build_design_matrix(const Eigen::VectorXd &t_diff, int degree, Eigen::MatrixXd &X);
+    // Determinant of a small (2x2 or 3x3) matrix without memory allocation
+    static double _determinant(const Eigen::MatrixXd &m);
 };
