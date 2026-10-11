@@ -19,6 +19,8 @@ set(BIUS_BASE_SOURCES
         src/tools.cpp
         src/loess.h
         src/loess.cpp
+        src/holt_winters.h
+        src/holt_winters.cpp
         src/generator.h
         src/generator.cpp
  )
@@ -31,6 +33,7 @@ set(BIUS_APP_SOURCES
 set(BIUS_TEST_SOURCES
         tests/sample_test.cpp
         tests/tools_test.cpp
+        tests/holt_winters_test.cpp
 )
 
 add_executable(loess_cpp

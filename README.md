@@ -18,6 +18,10 @@ supports:
 - Configurable **bandwidth** (fraction of the data used in each local window).
 - Batch evaluation of all target points with reused, pre-allocated buffers.
 
+On top of LOESS the project also ships a **Holt-Winters / ETS(A,A,A)** forecaster
+(`src/holt_winters.h`) for long-horizon extrapolation of series that have a trend and a
+seasonal cycle.
+
 ## Features
 
 - Header-only API surface (`src/loess.h`) with a compiled implementation.
@@ -39,12 +43,15 @@ supports:
 ├── main.cpp                # Entry point (delegates to run_app)
 ├── src/
 │   ├── loess.h / loess.cpp # LOESS implementation
+│   ├── holt_winters.h / .cpp # Holt-Winters / ETS(A,A,A) forecasting
 │   ├── generator.h / .cpp  # Synthetic time-series generator
 │   ├── app.h / app.cpp     # Demo application: generate → smooth → predict → benchmark
 │   ├── tools.h / tools.cpp # Wall-clock timestamp helpers
 │   └── printer.h           # Pretty-printing helpers for STL containers
 ├── tests/
-│   └── sample_test.cpp     # Catch2 test suite
+│   ├── sample_test.cpp     # Catch2 feature demo
+│   ├── tools_test.cpp      # differentiate / integrate tests
+│   └── holt_winters_test.cpp # Holt-Winters tests
 ├── libs/
 │   ├── eigen-3.4.0/        # Eigen (bundled)
 │   ├── json-3.11.3/        # nlohmann/json (bundled)
@@ -111,6 +118,25 @@ Eigen::MatrixXd predicted = loess.predict(series, new_times);
 Both methods return an `n x m` matrix whose first column holds the time stamps and whose
 remaining columns hold the smoothed/predicted values.
 
+### Forecasting with Holt-Winters
+
+```cpp
+#include <Eigen/Dense>
+#include "src/holt_winters.h"
+
+Eigen::MatrixXd series = /* ... */;   // column 0 is time
+
+// Seasonal period of 20 samples, smoothing parameters (alpha, beta, gamma)
+HoltWinters model(20, 0.2, 0.05, 0.1);
+
+Eigen::VectorXd new_times(2);
+new_times << 10.1, 20.0;
+Eigen::MatrixXd forecast = model.predict(series, new_times);
+```
+
+`predict` fits the model on `series` and returns an `m x n` matrix whose first column
+holds `new_times` and whose remaining columns hold the forecasts.
+
 ### Generating a synthetic series
 
 ```cpp
@@ -142,8 +168,8 @@ The number of rows is `floor(t_max / step) + 1`, with `t = 0, step, 2*step, ...`
 ```
 
 The demo generates a noisy sine + `asinh` series, prints it, smooths it, predicts at new
-time points, and then benchmarks `smooth` and `predict` (100 repetitions each, reporting
-mean and maximum time).
+time points, and then benchmarks `smooth`, LOESS `predict` and Holt-Winters `predict`
+(100 repetitions each, reporting mean and maximum time).
 
 ## API Reference
 
@@ -154,6 +180,19 @@ mean and maximum time).
 | `Loess(double bandwidth = 0.3, int degree = 1)`                                                      | Constructs a model. `bandwidth` is clamped to `[0.05, 1.0]`, `degree` to `[1, 2]`. |
 | `Eigen::MatrixXd smooth(const Eigen::MatrixXd &input_data) const`                                    | Smooths the input series.                                                          |
 | `Eigen::MatrixXd predict(const Eigen::MatrixXd &input_data, const Eigen::VectorXd &new_times) const` | Evaluates the model at the given time points.                                      |
+
+### `class HoltWinters`
+
+Additive Holt-Winters / ETS(A,A,A) forecasting model. The series is decomposed
+into a level, a trend and a seasonal component that are updated recursively
+(exponential smoothing). The seasonal component is initialized from a classical
+decomposition (centered moving average), which makes the model robust to series
+whose trend is not flat.
+
+| Member                                                                                                    | Description                                                                                                                    |
+|-----------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| `HoltWinters(int period = 1, double alpha = 0.3, double beta = 0.1, double gamma = 0.3)`                  | Constructs a model. `period` is the seasonal cycle length **in samples** (`1` disables seasonality); the smoothing parameters are clamped to `[0, 1]`. |
+| `Eigen::MatrixXd predict(const Eigen::MatrixXd &input_data, const Eigen::VectorXd &new_times) const`      | Fits the model on `input_data` and forecasts at `new_times`. The horizon is measured in samples relative to the last observed sample. |
 
 ### `Eigen::MatrixXd generate_time_series(const TimeSeriesParams &params)`
 

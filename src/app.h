@@ -9,6 +9,7 @@
 #include <Eigen/Dense>
 
 #include "generator.h"
+#include "holt_winters.h"
 #include "loess.h"
 #include "tools.h"
 
@@ -17,6 +18,10 @@
 
 // Creates the demo LOESS model.
 [[nodiscard]] Loess create_loess_quadratic();
+
+// Creates the demo Holt-Winters model. The seasonal period is expressed in
+// samples: a sine period of 2.0 time units at a 0.1 step is 20 samples.
+[[nodiscard]] HoltWinters create_holt_winters();
 
 // Prints a time series in the format (t1;x1)(t2;x2)...
 // The first column is treated as time, the rest as values.
@@ -51,6 +56,9 @@ void benchmark(const std::string& label, const int repetitions, Operation operat
 
 // Runs the demo: generate, smooth, predict and print the results.
 void test_loess();
+
+// Runs the Holt-Winters demo: generate, forecast and print the results.
+void test_holt_winters();
 
 // Application entry point: runs the demo and the benchmarks.
 void run_app();
