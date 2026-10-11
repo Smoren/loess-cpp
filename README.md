@@ -80,12 +80,12 @@ make build-tests     # build the test executable
 
 Other useful targets:
 
-| Target            | Description                                  |
-| ----------------- | -------------------------------------------- |
-| `make run-debug`  | Run the Debug demo executable                |
-| `make run-release`| Run the Release demo executable              |
-| `make test`       | Build and run the Catch2 test suite          |
-| `make clean`      | Remove the CMake build directories           |
+| Target             | Description                         |
+|--------------------|-------------------------------------|
+| `make run-debug`   | Run the Debug demo executable       |
+| `make run-release` | Run the Release demo executable     |
+| `make test`        | Build and run the Catch2 test suite |
+| `make clean`       | Remove the CMake build directories  |
 
 ## Usage
 
@@ -149,11 +149,11 @@ mean and maximum time).
 
 ### `class Loess`
 
-| Member | Description |
-| ------ | ----------- |
-| `Loess(double bandwidth = 0.3, int degree = 1)` | Constructs a model. `bandwidth` is clamped to `[0.05, 1.0]`, `degree` to `[1, 2]`. |
-| `Eigen::MatrixXd smooth(const Eigen::MatrixXd &input_data) const` | Smooths the input series. |
-| `Eigen::MatrixXd predict(const Eigen::MatrixXd &input_data, const Eigen::VectorXd &new_times) const` | Evaluates the model at the given time points. |
+| Member                                                                                               | Description                                                                        |
+|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
+| `Loess(double bandwidth = 0.3, int degree = 1)`                                                      | Constructs a model. `bandwidth` is clamped to `[0.05, 1.0]`, `degree` to `[1, 2]`. |
+| `Eigen::MatrixXd smooth(const Eigen::MatrixXd &input_data) const`                                    | Smooths the input series.                                                          |
+| `Eigen::MatrixXd predict(const Eigen::MatrixXd &input_data, const Eigen::VectorXd &new_times) const` | Evaluates the model at the given time points.                                      |
 
 ### `Eigen::MatrixXd generate_time_series(const TimeSeriesParams &params)`
 
@@ -161,11 +161,13 @@ Generates an `n x 2` matrix with columns `(t, x)` as described above.
 
 ### `src/tools.h`
 
-| Function | Description |
-| -------- | ----------- |
-| `double get_current_timestamp()` | Seconds since the epoch as a `double`. |
-| `long get_current_timestamp_micro()` | Microseconds since the epoch. |
-| `long get_current_timestamp_milli()` | Milliseconds since the epoch. |
+| Function                                                              | Description                                                                                     |
+|-----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| `double get_current_timestamp()`                                      | Seconds since the epoch as a `double`.                                                          |
+| `long get_current_timestamp_micro()`                                  | Microseconds since the epoch.                                                                   |
+| `long get_current_timestamp_milli()`                                  | Milliseconds since the epoch.                                                                   |
+| `Eigen::MatrixXd differentiate_series(const Eigen::MatrixXd &series)` | Extracts the rate-of-change series: column 0 holds interval midpoints, the rest hold `Δx / Δt`. |
+| `Eigen::MatrixXd integrate_series(const Eigen::MatrixXd &velocity_series, const Eigen::RowVectorXd &initial_point)` | Integrates a velocity series back into values via the trapezoidal rule. `initial_point` is the first row `(t, x1, x2, ...)`. |
 
 ## Testing
 

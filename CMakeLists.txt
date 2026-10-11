@@ -30,6 +30,7 @@ set(BIUS_APP_SOURCES
 
 set(BIUS_TEST_SOURCES
         tests/sample_test.cpp
+        tests/tools_test.cpp
 )
 
 add_executable(loess_cpp

@@ -16,7 +16,7 @@
 [[nodiscard]] Eigen::MatrixXd generate_custom_time_series();
 
 // Creates the demo LOESS model.
-[[nodiscard]] Loess create_loess();
+[[nodiscard]] Loess create_loess_quadratic();
 
 // Prints a time series in the format (t1;x1)(t2;x2)...
 // The first column is treated as time, the rest as values.
