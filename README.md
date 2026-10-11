@@ -20,7 +20,8 @@ supports:
 
 On top of LOESS the project also ships a **Holt-Winters / ETS(A,A,A)** forecaster
 (`src/holt_winters.h`) for long-horizon extrapolation of series that have a trend and a
-seasonal cycle.
+seasonal cycle. See [`HOLT_WINTERS.md`](HOLT_WINTERS.md) for the meaning of the smoothing
+coefficients and their effect on the forecast.
 
 ## Features
 
@@ -41,6 +42,7 @@ seasonal cycle.
 ├── CMakeLists.txt          # Build configuration (targets: loess_cpp, loess_tests)
 ├── Makefile                # Convenience wrapper around CMake
 ├── main.cpp                # Entry point (delegates to run_app)
+├── HOLT_WINTERS.md         # Notes on the Holt-Winters coefficients
 ├── src/
 │   ├── loess.h / loess.cpp # LOESS implementation
 │   ├── holt_winters.h / .cpp # Holt-Winters / ETS(A,A,A) forecasting
